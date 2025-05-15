@@ -102,7 +102,21 @@ const KioskoSidebar = ({ activeTab, setActiveTab, isAdmin, isMobileOpen, onClose
                 Productos
               </button>
             </li>
-            
+            <li className="mb-2">
+              <button
+                onClick={() => {
+                  setActiveTab('sales-report'); // Nueva pestaña para el reporte de ventas
+                  onClose();
+                }}
+                className={`w-full text-left px-4 py-2 rounded ${
+                  activeTab === 'sales-report' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'hover:bg-blue-100'
+                }`}
+              >
+                Reporte de Ventas
+              </button>
+            </li>
             {isAdmin && (
               <li className="mb-2">
                 <button
