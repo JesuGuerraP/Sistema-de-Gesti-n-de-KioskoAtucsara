@@ -13,6 +13,7 @@ import KioskoClientsList from './components/KioskoClientsList';
 import KioskoProductsList from './components/KioskoProductsList';
 import KioskoDashboard from './components/KioskoDashboard';
 import KioskoToast from './components/KioskoToast';
+import SalesReport from './components/SalesReport';
 
 // Componentes de autenticación
 import KioskoLogin from './components/KioscoLogin';
@@ -232,16 +233,26 @@ const MainApp = () => {
                 products={currentProducts}
                 clients={currentClients}
                 onAddDebt={handleAddDebt}
+                loggedUser={currentUser?.email}
               />
               <div className="mt-6">
                 <KioskoSalesForm
                   onAddDebt={handleAddDebt}
                   clients={currentClients}
                   products={currentProducts}
+                  loggedUser={currentUser?.email}
                 />
               </div>
             </>
           )}
+          {activeTab === 'sales-report' && (
+            <SalesReport
+              sales={currentDebts} // Pasar las deudas como ventas
+              users={[...new Set(currentDebts.map(debt => debt.user))]} // Extraer usuarios únicos
+               clients={currentClients} // <-- AGREGADO
+            />
+          )}
+
           
           {activeTab === 'debts' && (
             <KioskoDebtsList
