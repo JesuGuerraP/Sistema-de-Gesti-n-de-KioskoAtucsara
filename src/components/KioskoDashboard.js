@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import KioskoToast from './KioskoToast';
 
 const KioskoDashboard = ({ debts, products, clients, onAddDebt }) => {
-  const [clientId, setClientId] = useState('');
-  const [productId, setProductId] = useState('');
+  // Estados para el formulario mejorado
+  const [selectedClient, setSelectedClient] = useState('');
+  const [currentProduct, setCurrentProduct] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [isCredit, setIsCredit] = useState(false);
 
   // Calcular métricas financieras
@@ -22,22 +24,6 @@ const KioskoDashboard = ({ debts, products, clients, onAddDebt }) => {
   const totalRevenue = paidDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
   const totalPending = pendingDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
   const totalPotential = totalRevenue + totalPending;
-
-  const handleAddDebt = () => {
-    if (!clientId || !productId || quantity <= 0) return;
-
-    const newDebt = {
-      clientId,
-      items: [{ productId, quantity: parseInt(quantity) }],
-      paid: !isCredit,
-    };
-
-    onAddDebt(newDebt);
-    setClientId('');
-    setProductId('');
-    setQuantity(1);
-    setIsCredit(false);
-  };
 
   return (
     <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
@@ -83,59 +69,7 @@ const KioskoDashboard = ({ debts, products, clients, onAddDebt }) => {
             noCurrency
           />
         </div>
-
-        {/* Formulario de ventas */}
-        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm">
-          <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Registrar Venta</h2>
-          
-          <div className="space-y-3 md:space-y-4">
-            <FormSelect 
-              label="Cliente"
-              value={clientId}
-              onChange={setClientId}
-              options={clients}
-              className="mb-3 md:mb-4"
-            />
-            
-            <FormSelect 
-              label="Producto"
-              value={productId}
-              onChange={setProductId}
-              options={products}
-              className="mb-3 md:mb-4"
-            />
-            
-            <div>
-              <label className="block text-sm md:text-base text-gray-700 mb-1">Cantidad</label>
-              <input
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                min="1"
-                className="w-full border rounded-md py-2 px-3 text-sm md:text-base"
-              />
-            </div>
-            
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={isCredit}
-                onChange={(e) => setIsCredit(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label className="ml-2 block text-sm md:text-base text-gray-700">
-                Venta a crédito
-              </label>
-            </div>
-            
-            <button
-              onClick={handleAddDebt}
-              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm md:text-base transition-colors"
-            >
-              Registrar Venta
-            </button>
-          </div>
-        </div>
+        {/* Formulario de registrar venta eliminado */}
       </div>
     </main>
   );
@@ -164,24 +98,5 @@ const MetricCard = ({ title, value, color, noCurrency = false }) => {
     </div>
   );
 };
-
-// Componente auxiliar para selects del formulario
-const FormSelect = ({ label, value, onChange, options, className = '' }) => (
-  <div className={className}>
-    <label className="block text-sm md:text-base text-gray-700 mb-1">{label}</label>
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full border rounded-md py-2 px-3 text-sm md:text-base"
-    >
-      <option value="">Selecciona {label.toLowerCase()}</option>
-      {options.map(option => (
-        <option key={option.id} value={option.id}>
-          {option.name}
-        </option>
-      ))}
-    </select>
-  </div>
-);
 
 export default KioskoDashboard;
