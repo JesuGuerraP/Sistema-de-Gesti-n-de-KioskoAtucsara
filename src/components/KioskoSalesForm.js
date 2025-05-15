@@ -49,6 +49,8 @@ const KioskoSalesForm = ({ onAddDebt, clients, products, loggedUser }) => {
       showNotification('Selecciona un cliente y al menos un producto', 'error');
       return;
     }
+    const today = new Date();
+  const localDate = today.toLocaleDateString('en-CA');
     const newDebt = {
       clientId: selectedClient,
       items: selectedProducts.map(p => ({
@@ -56,7 +58,7 @@ const KioskoSalesForm = ({ onAddDebt, clients, products, loggedUser }) => {
         quantity: Number(p.quantity),
         price: Number(p.price)
       })),
-      date: new Date().toISOString().split('T')[0],
+      date: localDate,
       paid: !isCredit,
       user: loggedUser || ''
     };
