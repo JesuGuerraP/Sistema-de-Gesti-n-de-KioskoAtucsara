@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { getDocs, addDoc, updateDoc, deleteDoc, doc, query, collection, where, getDoc } from 'firebase/firestore';
+import { getDocs, addDoc, updateDoc, deleteDoc, doc, query, collection, where, getDoc, setDoc } from 'firebase/firestore';
 import { db, getCollectionRef } from './firebaseConfig';
 import { AuthProvider, useAuth } from './AuthContext';
 
@@ -29,6 +29,7 @@ const MainApp = () => {
   const [currentClients, setCurrentClients] = useState([]);
   const [currentDebts, setCurrentDebts] = useState([]);
   const [currentEgresos, setCurrentEgresos] = useState([]);
+  const [inversionInicial, setInversionInicial] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -51,6 +52,15 @@ const MainApp = () => {
         setCurrentClients(savedClients);
         setCurrentDebts(savedDebts);
         setCurrentEgresos(savedEgresos);
+
+        // Cargar inversión inicial
+        const inversionDocRef = doc(db, 'config', 'inversionInicial');
+        const inversionDoc = await getDoc(inversionDocRef);
+        if (inversionDoc.exists()) {
+          setInversionInicial(Number(inversionDoc.data().valor) || 0);
+        } else {
+          setInversionInicial(0);
+        }
       } catch (error) {
         console.error("Error loading data: ", error);
         showNotification('Error al cargar datos', 'error');
@@ -279,6 +289,7 @@ const MainApp = () => {
                 products={currentProducts}
                 clients={currentClients}
                 egresos={currentEgresos}
+                inversionInicial={inversionInicial}
                 onAddDebt={handleAddDebt}
                 loggedUser={currentUser?.email}
               />
@@ -337,6 +348,25 @@ const MainApp = () => {
               onAddEgreso={handleAddEgreso}
               onDeleteEgreso={handleDeleteEgreso}
               onEditEgreso={handleEditEgreso}
+              inversionInicial={inversionInicial}
+              setInversionInicial={async (nuevoValor) => {
+                try {
+                  const inversionDocRef = doc(db, 'config', 'inversionInicial');
+                  await updateDoc(inversionDocRef, { valor: Number(nuevoValor) });
+                  setInversionInicial(Number(nuevoValor));
+                  showNotification('Inversión inicial actualizada');
+                } catch (error) {
+                  // Si el doc no existe, lo creamos
+                  if (error.code === 'not-found' || error.message.includes('No document to update')) {
+                    const inversionDocRef = doc(db, 'config', 'inversionInicial');
+                    await setDoc(inversionDocRef, { valor: Number(nuevoValor) });
+                    setInversionInicial(Number(nuevoValor));
+                    showNotification('Inversión inicial guardada');
+                  } else {
+                    showNotification('Error al guardar inversión inicial', 'error');
+                  }
+                }
+              }}
             />
           )}
           

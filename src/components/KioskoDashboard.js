@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import KioskoToast from './KioskoToast';
 
-const KioskoDashboard = ({ debts, products, clients, egresos = [], onAddDebt }) => {
+const KioskoDashboard = ({ debts, products, clients, egresos = [], inversionInicial = 0, onAddDebt }) => {
   // Estados para el formulario mejorado
   const [selectedClient, setSelectedClient] = useState('');
   const [currentProduct, setCurrentProduct] = useState('');
@@ -21,7 +21,7 @@ const KioskoDashboard = ({ debts, products, clients, egresos = [], onAddDebt }) 
     }, 0);
   };
 
-  const totalRevenue = paidDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
+  const totalRevenue = paidDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0) + Number(inversionInicial || 0);
   const totalPending = pendingDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
   const totalGastos = egresos.reduce((sum, egreso) => sum + (Number(egreso.monto) || 0), 0);
   const totalPotential = totalRevenue + totalPending - totalGastos;

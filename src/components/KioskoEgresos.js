@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 
-const KioskoEgresos = ({ egresos, onAddEgreso, onDeleteEgreso, onEditEgreso }) => {
+const KioskoEgresos = ({ egresos, onAddEgreso, onDeleteEgreso, onEditEgreso, inversionInicial, setInversionInicial }) => {
   const [monto, setMonto] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [error, setError] = useState('');
   const [editId, setEditId] = useState(null);
   const [editMonto, setEditMonto] = useState('');
   const [editDescripcion, setEditDescripcion] = useState('');
+  const [editInversion, setEditInversion] = useState(inversionInicial);
+  const [savingInversion, setSavingInversion] = useState(false);
 
   const handleAddEgreso = (e) => {
     e.preventDefault();
@@ -63,6 +65,38 @@ const KioskoEgresos = ({ egresos, onAddEgreso, onDeleteEgreso, onEditEgreso }) =
   return (
     <div className="bg-white p-6 md:p-8 rounded-2xl shadow border border-gray-100 max-w-2xl mx-auto mt-8">
       <h2 className="text-2xl font-bold mb-8 text-gray-800 tracking-tight">Egresos</h2>
+
+      {/* Campo de inversión inicial */}
+      <form
+        onSubmit={async e => {
+          e.preventDefault();
+          setSavingInversion(true);
+          await setInversionInicial(editInversion);
+          setSavingInversion(false);
+        }}
+        className="mb-8 flex flex-col gap-3"
+      >
+        <label className="font-semibold text-gray-700 mb-1">Inversión Inicial</label>
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={editInversion}
+            onChange={e => setEditInversion(e.target.value)}
+            className="border border-blue-300 rounded-lg px-3 py-2 w-48 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition font-semibold"
+            disabled={savingInversion}
+          >
+            {savingInversion ? 'Guardando...' : 'Guardar'}
+          </button>
+          <span className="text-gray-500 text-sm ml-2">Valor actual: {Number(inversionInicial).toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</span>
+        </div>
+      </form>
+
       <form onSubmit={handleAddEgreso} className="mb-8 flex flex-col gap-3">
         <div>
           <input
