@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import KioskoToast from './KioskoToast';
 
-const KioskoDashboard = ({ debts, products, clients, onAddDebt }) => {
+const KioskoDashboard = ({ debts, products, clients, egresos = [], onAddDebt }) => {
   // Estados para el formulario mejorado
   const [selectedClient, setSelectedClient] = useState('');
   const [currentProduct, setCurrentProduct] = useState('');
@@ -23,60 +23,72 @@ const KioskoDashboard = ({ debts, products, clients, onAddDebt }) => {
 
   const totalRevenue = paidDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
   const totalPending = pendingDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
-  const totalPotential = totalRevenue + totalPending;
+  const totalGastos = egresos.reduce((sum, egreso) => sum + (Number(egreso.monto) || 0), 0);
+  const totalPotential = totalRevenue + totalPending - totalGastos;
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Resumen Financiero</h2>
+    <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold mb-8 text-gray-800 tracking-tight">Resumen Financiero</h2>
 
         {/* Tarjetas de métricas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <MetricCard 
             title="Dinero Recibido" 
             value={totalRevenue} 
             color="blue" 
+            icon={<span className="inline-block align-middle text-blue-400 mr-2">💰</span>}
           />
           <MetricCard 
             title="Dinero Pendiente" 
             value={totalPending} 
             color="yellow" 
+            icon={<span className="inline-block align-middle text-yellow-400 mr-2">⏳</span>}
           />
           <MetricCard 
             title="Total Potencial" 
             value={totalPotential} 
             color="green" 
+            icon={<span className="inline-block align-middle text-green-400 mr-2">📈</span>}
+          />
+          <MetricCard 
+            title="Gastos" 
+            value={totalGastos} 
+            color="red" 
+            icon={<span className="inline-block align-middle text-red-400 mr-2">💸</span>}
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
           <MetricCard 
             title="Ventas Totales" 
             value={totalSales} 
             color="gray" 
             noCurrency
+            icon={<span className="inline-block align-middle text-gray-400 mr-2">🧾</span>}
           />
           <MetricCard 
             title="Deudas Pendientes" 
             value={pendingDebts.length} 
             color="red" 
             noCurrency
+            icon={<span className="inline-block align-middle text-red-400 mr-2">⚠️</span>}
           />
           <MetricCard 
-            title="Clientes Registrados" 
+            title="Clientes" 
             value={clients.length} 
             color="green" 
             noCurrency
+            icon={<span className="inline-block align-middle text-green-400 mr-2">👥</span>}
           />
         </div>
-        {/* Formulario de registrar venta eliminado */}
       </div>
     </main>
   );
 };
 
 // Componente auxiliar para tarjetas de métricas
-const MetricCard = ({ title, value, color, noCurrency = false }) => {
+const MetricCard = ({ title, value, color, noCurrency = false, icon }) => {
   const colorClasses = {
     blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', textDark: 'text-blue-800' },
     yellow: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', textDark: 'text-yellow-800' },
@@ -90,11 +102,9 @@ const MetricCard = ({ title, value, color, noCurrency = false }) => {
     : value.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
 
   return (
-    <div className={`${colorClasses[color].bg} p-3 md:p-4 rounded-lg border ${colorClasses[color].border}`}>
-      <h3 className={`text-xs md:text-sm font-medium ${colorClasses[color].text}`}>{title}</h3>
-      <p className={`text-xl md:text-2xl font-semibold ${colorClasses[color].textDark}`}>
-        {displayValue}
-      </p>
+    <div className={`flex flex-col items-start justify-between ${colorClasses[color].bg} p-5 rounded-xl border ${colorClasses[color].border} shadow-sm transition hover:shadow-md`}>      
+      <div className="flex items-center mb-2">{icon}<h3 className={`text-sm font-semibold ${colorClasses[color].text}`}>{title}</h3></div>
+      <p className={`text-2xl font-bold ${colorClasses[color].textDark}`}>{displayValue}</p>
     </div>
   );
 };

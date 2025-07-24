@@ -69,7 +69,7 @@ const KioskoSidebar = ({ activeTab, setActiveTab, isAdmin, isMobileOpen, onClose
                   : 'hover:bg-blue-100'
                 }`}
               >
-                Deudas
+                Ventas
               </button>
             </li>
             <li className="mb-2">
@@ -115,6 +115,21 @@ const KioskoSidebar = ({ activeTab, setActiveTab, isAdmin, isMobileOpen, onClose
                 }`}
               >
                 Reporte de Ventas
+              </button>
+            </li>
+            <li className="mb-2">
+              <button
+                onClick={() => {
+                  setActiveTab('egresos');
+                  onClose();
+                }}
+                className={`w-full text-left px-4 py-2 rounded ${
+                  activeTab === 'egresos' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'hover:bg-blue-100'
+                }`}
+              >
+                Egresos
               </button>
             </li>
             {isAdmin && (

@@ -8,6 +8,7 @@ const KioskoDebtsList = ({ debts, onMarkAsPaid, onDeleteDebt, clients, products 
   const [editingDebt, setEditingDebt] = useState(null);
   const [selectedClient, setSelectedClient] = useState('');
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'paid', 'pending'
 
   const getClientName = (clientId) => {
     const client = clients.find(c => c.id === clientId);
@@ -72,8 +73,8 @@ const KioskoDebtsList = ({ debts, onMarkAsPaid, onDeleteDebt, clients, products 
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Listado de Deudas</h2>
+    <div className="bg-white p-6 md:p-8 rounded-2xl shadow border border-gray-100 max-w-5xl mx-auto mt-8">
+      <h2 className="text-2xl font-bold mb-8 text-gray-800 tracking-tight">Listado de Ventas</h2>
 
       {showToast && (
         <KioskoToast
@@ -83,72 +84,107 @@ const KioskoDebtsList = ({ debts, onMarkAsPaid, onDeleteDebt, clients, products 
         />
       )}
 
+      {/* Filtros por estado */}
+      <div className="mb-6 flex gap-2 flex-wrap">
+        <button
+          className={`px-4 py-1 rounded-lg font-medium text-sm transition ${filterStatus === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-blue-100'}`}
+          onClick={() => setFilterStatus('all')}
+        >
+          Todas
+        </button>
+        <button
+          className={`px-4 py-1 rounded-lg font-medium text-sm transition ${filterStatus === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-yellow-100'}`}
+          onClick={() => setFilterStatus('pending')}
+        >
+          Pendientes
+        </button>
+        <button
+          className={`px-4 py-1 rounded-lg font-medium text-sm transition ${filterStatus === 'paid' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-green-100'}`}
+          onClick={() => setFilterStatus('paid')}
+        >
+          Pagadas
+        </button>
+      </div>
+
       {debts.length === 0 ? (
-        <p className="text-gray-500">No hay deudas registradas</p>
+        <p className="text-gray-500">No hay ventas registradas</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Productos</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+          <table className="w-full border-collapse min-w-[700px]">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Cliente</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Productos</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {debts.map(debt => {
-                const total = calculateTotal(debt.items);
-                return (
-                  <tr key={debt.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{getClientName(debt.clientId)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{debt.date}</td>
-                    <td className="px-6 py-4">
-                      <ul className="list-disc pl-5">
-                        {debt.items.map((item, index) => {
-                          const product = getProductDetails(item.productId);
-                          const price = parseFloat(product.price);
-                          return (
-                            <li key={index}>
-                              {product.name} x {item.quantity} ({isNaN(price) ? 'Precio inválido' : `$${price.toFixed(2)}`} c/u)
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">${isNaN(total) ? 'Total inválido' : total.toFixed(2)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${debt.paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {debt.paid ? 'Pagada' : 'Pendiente'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap space-x-2">
-                      {!debt.paid && (
+            <tbody>
+              {debts
+                .filter(debt => {
+                  if (filterStatus === 'all') return true;
+                  if (filterStatus === 'pending') return !debt.paid;
+                  if (filterStatus === 'paid') return debt.paid;
+                  return true;
+                })
+                .sort((a, b) => {
+                  // Ordenar de más reciente a más antigua
+                  const dateA = new Date(a.date);
+                  const dateB = new Date(b.date);
+                  return dateB - dateA;
+                })
+                .map(debt => {
+                  const total = calculateTotal(debt.items);
+                  return (
+                    <tr key={debt.id} className="hover:bg-gray-50 transition">
+                      <td className="p-3 whitespace-nowrap text-gray-700">{getClientName(debt.clientId)}</td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">{debt.date}</td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">
+                        <ul className="list-disc pl-5">
+                          {debt.items.map((item, index) => {
+                            const product = getProductDetails(item.productId);
+                            const price = parseFloat(product.price);
+                            return (
+                              <li key={index} className="text-xs text-gray-600">
+                                {product.name} x {item.quantity} ({isNaN(price) ? 'Precio inválido' : `${price.toFixed(2)}`} c/u)
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">${isNaN(total) ? 'Total inválido' : total.toFixed(2)}</td>
+                      <td className="p-3 whitespace-nowrap">
+                        <span className={debt.paid ? "bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs" : "bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs"}>
+                          {debt.paid ? 'Pagada' : 'Pendiente'}
+                        </span>
+                      </td>
+                      <td className="p-3 whitespace-nowrap space-x-2">
+                        {!debt.paid && (
+                          <button
+                            onClick={() => onMarkAsPaid(debt.id)}
+                            className="text-green-600 hover:text-green-900 text-xs font-semibold"
+                          >
+                            Pagar
+                          </button>
+                        )}
                         <button
-                          onClick={() => onMarkAsPaid(debt.id)}
-                          className="text-green-600 hover:text-green-900 text-sm"
+                          onClick={() => handleEditDebt(debt)}
+                          className="text-blue-600 hover:text-blue-900 text-xs font-semibold"
                         >
-                          Pagar
+                          Editar
                         </button>
-                      )}
-                      <button
-                        onClick={() => handleEditDebt(debt)}
-                        className="text-blue-600 hover:text-blue-900 text-sm"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(debt.id)}
-                        className="text-red-600 hover:text-red-900 text-sm"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                        <button
+                          onClick={() => handleDelete(debt.id)}
+                          className="text-red-600 hover:text-red-900 text-xs font-semibold"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

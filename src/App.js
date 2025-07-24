@@ -14,6 +14,7 @@ import KioskoProductsList from './components/KioskoProductsList';
 import KioskoDashboard from './components/KioskoDashboard';
 import KioskoToast from './components/KioskoToast';
 import SalesReport from './components/SalesReport';
+import KioskoEgresos from './components/KioskoEgresos';
 
 // Componentes de autenticación
 import KioskoLogin from './components/KioscoLogin';
@@ -27,6 +28,7 @@ const MainApp = () => {
   const [currentProducts, setCurrentProducts] = useState([]);
   const [currentClients, setCurrentClients] = useState([]);
   const [currentDebts, setCurrentDebts] = useState([]);
+  const [currentEgresos, setCurrentEgresos] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -38,14 +40,17 @@ const MainApp = () => {
         const productsSnapshot = await getDocs(getCollectionRef('products'));
         const clientsSnapshot = await getDocs(getCollectionRef('clients'));
         const debtsSnapshot = await getDocs(getCollectionRef('debts'));
+        const egresosSnapshot = await getDocs(getCollectionRef('egresos'));
 
         const savedProducts = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const savedClients = clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const savedDebts = debtsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const savedEgresos = egresosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         setCurrentProducts(savedProducts);
         setCurrentClients(savedClients);
         setCurrentDebts(savedDebts);
+        setCurrentEgresos(savedEgresos);
       } catch (error) {
         console.error("Error loading data: ", error);
         showNotification('Error al cargar datos', 'error');
@@ -97,6 +102,47 @@ const MainApp = () => {
     } catch (error) {
       console.error("Error deleting debt: ", error);
       showNotification('Error al eliminar deuda', 'error');
+    }
+  };
+
+  // Egresos
+  const handleAddEgreso = async (egreso) => {
+    try {
+      const egresoRef = await addDoc(getCollectionRef('egresos'), egreso);
+      setCurrentEgresos([...currentEgresos, { ...egreso, id: egresoRef.id }]);
+      showNotification('Egreso registrado exitosamente');
+    } catch (error) {
+      console.error("Error adding egreso: ", error);
+      showNotification('Error al registrar egreso', 'error');
+    }
+  };
+
+  const handleDeleteEgreso = async (egresoId) => {
+    try {
+      const egresoRef = doc(db, 'egresos', String(egresoId));
+      await deleteDoc(egresoRef);
+      setCurrentEgresos(currentEgresos.filter(e => String(e.id) !== String(egresoId)));
+      showNotification('Egreso eliminado correctamente');
+    } catch (error) {
+      console.error("Error deleting egreso: ", error);
+      showNotification('Error al eliminar egreso', 'error');
+    }
+  };
+
+  // Editar egreso
+  const handleEditEgreso = async (egresoEditado) => {
+    try {
+      const egresoRef = doc(db, 'egresos', String(egresoEditado.id));
+      await updateDoc(egresoRef, {
+        monto: egresoEditado.monto,
+        descripcion: egresoEditado.descripcion,
+        fecha: egresoEditado.fecha
+      });
+      setCurrentEgresos(currentEgresos.map(e => String(e.id) === String(egresoEditado.id) ? egresoEditado : e));
+      showNotification('Egreso editado correctamente');
+    } catch (error) {
+      console.error("Error editando egreso: ", error);
+      showNotification('Error al editar egreso', 'error');
     }
   };
 
@@ -232,6 +278,7 @@ const MainApp = () => {
                 debts={currentDebts}
                 products={currentProducts}
                 clients={currentClients}
+                egresos={currentEgresos}
                 onAddDebt={handleAddDebt}
                 loggedUser={currentUser?.email}
               />
@@ -249,7 +296,8 @@ const MainApp = () => {
             <SalesReport
               sales={currentDebts} // Pasar las deudas como ventas
               users={[...new Set(currentDebts.map(debt => debt.user))]} // Extraer usuarios únicos
-               clients={currentClients} // <-- AGREGADO
+              clients={currentClients}
+              products={currentProducts}
             />
           )}
 
@@ -280,6 +328,15 @@ const MainApp = () => {
               onAddProduct={handleAddProduct}
               onDeleteProduct={handleDeleteProduct}
               debts={currentDebts}
+            />
+          )}
+          
+          {activeTab === 'egresos' && (
+            <KioskoEgresos
+              egresos={currentEgresos}
+              onAddEgreso={handleAddEgreso}
+              onDeleteEgreso={handleDeleteEgreso}
+              onEditEgreso={handleEditEgreso}
             />
           )}
           

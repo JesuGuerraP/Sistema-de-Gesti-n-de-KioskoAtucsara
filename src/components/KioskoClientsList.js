@@ -69,7 +69,6 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
     }
 
     if (window.confirm('¿Estás seguro de eliminar este cliente?')) {
-      console.log("Deleting client with ID:", clientId); // Mensaje de depuración
       onDeleteClient(clientId);
       setToastMessage('Cliente eliminado correctamente');
       setToastType('success');
@@ -78,7 +77,7 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white p-6 md:p-8 rounded-2xl shadow border border-gray-100 max-w-4xl mx-auto mt-8">
       {showToast && (
         <KioskoToast
           message={toastMessage}
@@ -87,12 +86,12 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
         />
       )}
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Clientes</h2>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-2">
+        <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Clientes</h2>
         <div className="text-sm text-gray-500">{clients.length} clientes registrados</div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mb-6">
+      <form onSubmit={handleSubmit} className="mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
@@ -101,7 +100,7 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
               name="name"
               value={editingClient ? editingClient.name : newClient.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               required
             />
           </div>
@@ -112,14 +111,14 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
               name="phone"
               value={editingClient ? editingClient.phone : newClient.phone}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               required
             />
           </div>
           <div className="flex items-end space-x-2">
             <button
               type="submit"
-              className="flex-1 py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
             >
               {editingClient ? 'Actualizar' : 'Agregar'} Cliente
             </button>
@@ -127,7 +126,7 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
               >
                 Cancelar
               </button>
@@ -139,44 +138,44 @@ const KioskoClientsList = ({ clients, onAddClient, onDeleteClient, debts, produc
       {clients.length === 0 ? (
         <p className="text-gray-500">No hay clientes registrados</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deudas Pendientes</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Adeudado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+          <table className="w-full border-collapse min-w-[700px]">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Teléfono</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Deudas Pendientes</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Adeudado</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {clients.map(client => {
                 const pendingCount = countPendingDebts(client.id);
                 const pendingAmount = calculatePendingDebts(client.id);
 
                 return (
-                  <tr key={client.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{client.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{client.phone}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                  <tr key={client.id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 whitespace-nowrap text-gray-700">{client.name}</td>
+                    <td className="p-3 whitespace-nowrap text-gray-700">{client.phone}</td>
+                    <td className="p-3 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${pendingCount > 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
                         {pendingCount}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium">
+                    <td className="p-3 whitespace-nowrap font-medium text-gray-700">
                       ${pendingAmount.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                    <td className="p-3 whitespace-nowrap space-x-2">
                       <button
                         onClick={() => handleEditClient(client)}
-                        className="text-blue-600 hover:text-blue-900 text-sm"
+                        className="text-blue-600 hover:text-blue-900 text-xs font-semibold"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleDeleteClient(client.id)}
-                        className="text-red-600 hover:text-red-900 text-sm"
+                        className="text-red-600 hover:text-red-900 text-xs font-semibold"
                       >
                         Eliminar
                       </button>

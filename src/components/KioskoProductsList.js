@@ -76,7 +76,7 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white p-6 md:p-8 rounded-2xl shadow border border-gray-100 max-w-4xl mx-auto mt-8">
       {showToast && (
         <KioskoToast
           message={toastMessage}
@@ -85,12 +85,12 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
         />
       )}
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Productos</h2>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-2">
+        <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Productos</h2>
         <div className="text-sm text-gray-500">{products.length} productos registrados</div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mb-6">
+      <form onSubmit={handleSubmit} className="mb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
@@ -99,7 +99,7 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
               name="name"
               value={editingProduct ? editingProduct.name : newProduct.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               required
             />
           </div>
@@ -112,7 +112,7 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
               step="0.01"
               value={editingProduct ? editingProduct.price : newProduct.price}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               required
             />
           </div>
@@ -122,9 +122,8 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
               name="type"
               value={editingProduct ? editingProduct.type : newProduct.type}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
             >
-
               <option value="">Selecione..</option>
               <option value="Mecato">Mecato</option>
               <option value="Bebida">Bebida</option>
@@ -136,7 +135,7 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
           <div className="flex items-end space-x-2">
             <button
               type="submit"
-              className="flex-1 py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
             >
               {editingProduct ? 'Actualizar' : 'Agregar'} Producto
             </button>
@@ -144,7 +143,7 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
               >
                 Cancelar
               </button>
@@ -156,34 +155,34 @@ const KioskoProductsList = ({ products, onAddProduct, onDeleteProduct, debts }) 
       {products.length === 0 ? (
         <p className="text-gray-500">No hay productos registrados</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+          <table className="w-full border-collapse min-w-[700px]">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Precio</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th className="border-b p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {products.map(product => {
                 const price = parseFloat(product.price);
                 return (
-                  <tr key={product.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{product.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{isNaN(price) ? 'Precio inválido' : `$${price.toFixed(2)}`}</td>
-                    <td className="px-6 py-4 whitespace-nowrap capitalize">{product.type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                  <tr key={product.id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 whitespace-nowrap text-gray-700">{product.name}</td>
+                    <td className="p-3 whitespace-nowrap text-gray-700">{isNaN(price) ? 'Precio inválido' : `$${price.toFixed(2)}`}</td>
+                    <td className="p-3 whitespace-nowrap capitalize text-gray-700">{product.type}</td>
+                    <td className="p-3 whitespace-nowrap space-x-2">
                       <button
                         onClick={() => handleEditProduct(product)}
-                        className="text-blue-600 hover:text-blue-900 text-sm"
+                        className="text-blue-600 hover:text-blue-900 text-xs font-semibold"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
-                        className="text-red-600 hover:text-red-900 text-sm"
+                        className="text-red-600 hover:text-red-900 text-xs font-semibold"
                       >
                         Eliminar
                       </button>
