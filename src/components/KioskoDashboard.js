@@ -24,7 +24,8 @@ const KioskoDashboard = ({ debts, products, clients, egresos = [], inversionInic
   const totalRevenue = paidDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0) + Number(inversionInicial || 0);
   const totalPending = pendingDebts.reduce((sum, debt) => sum + calculateTotal(debt.items), 0);
   const totalGastos = egresos.reduce((sum, egreso) => sum + (Number(egreso.monto) || 0), 0);
-  const totalPotential = totalRevenue + totalPending - totalGastos;
+  // El total potencial solo suma lo recibido (deudas pagadas + inversion) menos los gastos
+  const totalPotential = totalRevenue - totalGastos;
 
   return (
     <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
