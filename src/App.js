@@ -15,6 +15,7 @@ import KioskoDashboard from './components/KioskoDashboard';
 import KioskoToast from './components/KioskoToast';
 import SalesReport from './components/SalesReport';
 import KioskoEgresos from './components/KioskoEgresos';
+import KioskoAnalytics from './components/KioskoAnalytics';
 
 // Componentes de autenticación
 import KioskoLogin from './components/KioscoLogin';
@@ -24,6 +25,9 @@ import KioskoProtectedRoute from './components/KioskoProtectedRoute';
 const MainApp = () => {
   const { currentUser, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  console.log('MainApp Render. ActiveTab:', activeTab); // DEBUG LOG
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [currentClients, setCurrentClients] = useState([]);
@@ -183,22 +187,22 @@ const MainApp = () => {
         where('clientId', '==', clientId),
         where('paid', '==', false)
       );
-      
+
       const pendingDebtsSnapshot = await getDocs(debtsQuery);
-      
+
       if (!pendingDebtsSnapshot.empty) {
         showNotification('No puedes eliminar un cliente con deudas pendientes', 'error');
         return;
       }
-      
+
       const clientRef = doc(db, 'clients', clientId);
       const clientDoc = await getDoc(clientRef);
-      
+
       if (!clientDoc.exists()) {
         showNotification('El cliente no existe o ya ha sido eliminado', 'warning');
         return;
       }
-      
+
       await deleteDoc(clientRef);
       setCurrentClients(currentClients.filter(client => client.id !== clientId));
       showNotification('Cliente eliminado correctamente');
@@ -232,23 +236,23 @@ const MainApp = () => {
     try {
       const productRef = doc(db, 'products', productId);
       const productSnapshot = await getDoc(productRef);
-      
+
       if (!productSnapshot.exists()) {
         showNotification('El producto no existe o ya ha sido eliminado', 'warning');
         return;
       }
-      
-      const productInUse = currentDebts.some(debt => 
+
+      const productInUse = currentDebts.some(debt =>
         debt.items.some(item => item.productId === productId)
       );
-      
+
       if (productInUse) {
         showNotification('No puedes eliminar un producto que está en uso en deudas registradas', 'error');
         return;
       }
-      
+
       await deleteDoc(productRef);
-      setCurrentProducts(prevProducts => 
+      setCurrentProducts(prevProducts =>
         prevProducts.filter(product => product.id !== productId)
       );
       showNotification('Producto eliminado correctamente', 'success');
@@ -261,18 +265,18 @@ const MainApp = () => {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar responsivo */}
-      <KioskoSidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+      <KioskoSidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         isAdmin={isAdmin}
         isMobileOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
-      
+
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <KioskoHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        
+
         {showToast && (
           <KioskoToast
             message={toastMessage}
@@ -280,8 +284,8 @@ const MainApp = () => {
             onClose={() => setShowToast(false)}
           />
         )}
-        
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50">
           {activeTab === 'dashboard' && (
             <>
               <KioskoDashboard
@@ -312,7 +316,13 @@ const MainApp = () => {
             />
           )}
 
-          
+          {activeTab === 'analytics' && (
+            <KioskoAnalytics
+              debts={currentDebts}
+              products={currentProducts}
+            />
+          )}
+
           {activeTab === 'debts' && (
             <KioskoDebtsList
               debts={currentDebts}
@@ -322,7 +332,7 @@ const MainApp = () => {
               products={currentProducts}
             />
           )}
-          
+
           {activeTab === 'clients' && (
             <KioskoClientsList
               clients={currentClients}
@@ -332,7 +342,7 @@ const MainApp = () => {
               products={currentProducts}
             />
           )}
-          
+
           {activeTab === 'products' && (
             <KioskoProductsList
               products={currentProducts}
@@ -341,7 +351,7 @@ const MainApp = () => {
               debts={currentDebts}
             />
           )}
-          
+
           {activeTab === 'egresos' && (
             <KioskoEgresos
               egresos={currentEgresos}
@@ -369,11 +379,11 @@ const MainApp = () => {
               }}
             />
           )}
-          
+
           {activeTab === 'admin' && isAdmin && (
             <KioskoAdminPanel
               currentUser={currentUser}
-              onLogout={() => {}}
+              onLogout={() => { }}
             />
           )}
         </main>
@@ -411,11 +421,11 @@ const App = () => {
 
 const PublicRoute = ({ children }) => {
   const { currentUser } = useAuth();
-  
+
   if (currentUser) {
     return <Navigate to="/dashboard" />;
   }
-  
+
   return children;
 };
 

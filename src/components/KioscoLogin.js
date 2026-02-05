@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import KioskoToast from './KioskoToast';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
+import Input from './ui/Input';
+import Button from './ui/Button';
 
 const KioskoLogin = () => {
   const [email, setEmail] = useState('');
@@ -55,7 +58,7 @@ const KioskoLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
       {showToast && (
         <KioskoToast
           message={toastMessage}
@@ -63,98 +66,84 @@ const KioskoLogin = () => {
           onClose={() => setShowToast(false)}
         />
       )}
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
-        <div className="text-center">
-          <img
-            className="mx-auto h-24 w-auto"
-            src="https://tse2.mm.bing.net/th/id/OIP.La71U7I4-PpTM3QO4-f1GAAAAA?cb=iwp1&rs=1&pid=ImgDetMain"
-            alt="Workflow"
-          />
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sistema de Gestión de Kiosko Atucsara
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Inicia sesión para acceder al sistema y gestionar tus ventas, clientes y productos.
-          </p>
+
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-600 text-white mb-4 shadow-lg shadow-primary-500/30">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72l1.189-1.19A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Kiosko Atucsara</h2>
+          <p className="mt-2 text-sm text-slate-600">Gestión inteligente de ventas e inventario</p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
-                Correo electrónico
-              </label>
-              <input
+
+        <Card className="shadow-xl border-slate-200">
+          <CardContent className="p-8">
+            <form className="space-y-6" onSubmit={handleLogin}>
+              {error && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <Input
+                label="Correo electrónico"
                 id="email-address"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Correo electrónico"
+                placeholder="ejemplo@correo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Contraseña
-              </label>
-              <input
+
+              <Input
+                label="Contraseña"
                 id="password"
                 name="password"
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </div>
-          </div>
 
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
+              <div>
+                <Button
+                  type="submit"
+                  className="w-full justify-center"
+                  size="lg"
+                  isLoading={loading}
+                  variant="primary"
+                >
+                  {loading ? 'Iniciando sesión...' : 'Ingresar al Sistema'}
+                </Button>
               </div>
-            </div>
-          )}
+            </form>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Iniciando sesión...
-                </>
-              ) : (
-                'Iniciar sesión'
-              )}
-            </button>
-          </div>
-        </form>
-        <div className="text-center mt-4">
-          <p className="text-sm text-gray-600">
-            ¿No tienes una cuenta? <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">Contacta al administrador</a>
-          </p>
-        </div>
+            <div className="mt-6 text-center">
+              <p className="text-xs text-slate-500">
+                ¿Problemas para acceder? <a href="#" className="font-medium text-primary-600 hover:text-primary-500">Contactar soporte</a>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <p className="mt-8 text-center text-xs text-slate-400">
+          &copy; {new Date().getFullYear()} Sistema Kiosko Atucsara. Todos los derechos reservados.
+        </p>
       </div>
     </div>
   );
