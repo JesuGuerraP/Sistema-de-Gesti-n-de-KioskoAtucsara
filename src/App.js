@@ -320,6 +320,9 @@ const MainApp = () => {
             <KioskoAnalytics
               debts={currentDebts}
               products={currentProducts}
+              clients={currentClients}
+              egresos={currentEgresos}
+              inversionInicial={inversionInicial}
             />
           )}
 
